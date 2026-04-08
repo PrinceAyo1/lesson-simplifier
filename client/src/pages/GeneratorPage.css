@@ -1,0 +1,247 @@
+.generator-page {
+  min-height: 100vh;
+  background: var(--bg);
+  padding: 1.5rem 0 4rem;
+}
+
+.generator-container {
+  width: min(100% - 2rem, 1100px);
+  margin: 0 auto;
+}
+
+.generator-header {
+  margin-bottom: 1.5rem;
+}
+
+.generator-eyebrow {
+  color: var(--primary-dark);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.generator-header h1 {
+  font-size: clamp(2rem, 7vw, 3.5rem);
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+  margin-bottom: 0.8rem;
+}
+
+.generator-subtext {
+  color: var(--text-soft);
+  max-width: 42rem;
+}
+
+.generator-input-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 1.2rem;
+  box-shadow: var(--shadow);
+  margin-bottom: 1rem;
+}
+
+.input-label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.generator-textarea {
+  width: 100%;
+  min-height: 140px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 1rem;
+  resize: vertical;
+  outline: none;
+  background: #fff;
+  color: var(--text);
+  margin-bottom: 1rem;
+}
+
+.generator-textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(79, 124, 255, 0.15);
+}
+.form-group select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(79, 124, 255, 0.12);
+}
+
+.generator-controls {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-group {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.form-group label {
+  font-weight: 600;
+}
+
+.form-group select {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 0.85rem 0.95rem;
+  background: #fff;
+  outline: none;
+}
+
+.generate-btn {
+  width: 100%;
+  border: none;
+  border-radius: 999px;
+  padding: 1rem 1.2rem;
+  background: var(--primary);
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    opacity 1;
+}
+
+.generate-btn:hover {
+  background: var(--primary-dark);
+}
+
+.generate-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.generate-btn:hover:not(:disabled) {
+  background: var(--primary-dark);
+}
+
+.generator-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.meta-pill {
+  background: #eaf0ff;
+  color: var(--primary-dark);
+  padding: 0.55rem 0.85rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.generator-output {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.output-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.output-topbar h2 {
+  font-size: 1.5rem;
+}
+
+.output-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.secondary-action-btn {
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+  border-radius: 999px;
+  padding: 0.7rem 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.output-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.output-section-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 1.2rem;
+  box-shadow: var(--shadow);
+}
+
+.output-section-card h2 {
+  font-size: 1.15rem;
+  margin-bottom: 0.9rem;
+}
+
+.output-list {
+  padding-left: 1.2rem;
+  display: grid;
+  gap: 0.65rem;
+  color: var(--text-soft);
+}
+
+.tasks-list {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.task-item {
+  background: var(--surface-muted);
+  border-radius: 18px;
+  padding: 1rem;
+}
+
+.task-question {
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.toggle-answer-btn {
+  border: none;
+  background: var(--dark);
+  color: white;
+  border-radius: 999px;
+  padding: 0.65rem 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.task-answer {
+  margin-top: 0.8rem;
+  color: var(--text-soft);
+}
+
+.example-prompt {
+  font-size: 0.9rem;
+  color: var(--primary-dark);
+  cursor: pointer;
+  margin-bottom: 1rem;
+}
+
+.example-prompt:hover {
+  text-decoration: underline;
+}
+
+@media (min-width: 768px) {
+  .generator-controls {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .output-grid {
+    grid-template-columns: repeat(3, 1fr);
+    align-items: start;
+  }
+}
