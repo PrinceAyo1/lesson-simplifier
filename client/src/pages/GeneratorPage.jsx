@@ -38,6 +38,7 @@ export default function GeneratorPage() {
   const [difficulty, setDifficulty] = useState("Level 1");
   const [lesson, setLesson] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const handleGenerate = async () => {
     try {
@@ -67,6 +68,44 @@ export default function GeneratorPage() {
       alert("Something went wrong. Try again.");
     } finally {
       setIsLoading(false);
+    }
+  };
+  const handleCopy = async () => {
+    if (!lesson) return;
+
+    const formattedText = `
+Lesson Simplifier Output
+
+Teaching Request:
+${prompt}
+
+Subject: ${subject}
+Difficulty: ${difficulty}
+
+Simple Explanation:
+${lesson.simpleExplanation.map((item, index) => `${index + 1}. ${item}`).join("\n")}
+
+Examples:
+${lesson.examples.map((item, index) => `${index + 1}. ${item}`).join("\n")}
+
+Mini Tasks:
+${lesson.miniTasks
+  .map(
+    (task, index) => `${index + 1}. ${task.question}\nAnswer: ${task.answer}`,
+  )
+  .join("\n\n")}
+  `.trim();
+
+    try {
+      await navigator.clipboard.writeText(formattedText);
+      setCopied(true);
+
+      setTimeout(() => {
+        setCopied(false);
+      }, 2000);
+    } catch (error) {
+      console.error("Copy failed:", error);
+      alert("Copy failed. Please try again.");
     }
   };
 
@@ -154,7 +193,9 @@ export default function GeneratorPage() {
             <div className="output-topbar">
               <h2>Your lesson output</h2>
               <div className="output-actions">
-                <button className="secondary-action-btn">Copy</button>
+                <button className="secondary-action-btn" onClick={handleCopy}>
+                  {copied ? "Copied!" : "Copy"}
+                </button>
                 <button className="secondary-action-btn">Save</button>
                 <button className="secondary-action-btn">Export PDF</button>
               </div>
