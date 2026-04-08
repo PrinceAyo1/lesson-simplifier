@@ -58,13 +58,35 @@ export default function GeneratorPage() {
   const [lesson, setLesson] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleGenerate = () => {
-    setIsLoading(true);
+  const handleGenerate = async () => {
+    try {
+      setIsLoading(true);
 
-    setTimeout(() => {
-      setLesson(mockLesson);
+      const response = await fetch("http://localhost:5000/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt,
+          subject,
+          difficulty,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to generate lesson");
+      }
+
+      const data = await response.json();
+
+      setLesson(data);
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong. Try again.");
+    } finally {
       setIsLoading(false);
-    }, 700);
+    }
   };
 
   return (
