@@ -140,11 +140,7 @@ export default function GeneratorPage() {
             onClick={handleGenerate}
             disabled={isLoading || !prompt.trim()}
           >
-            {isLoading
-              ? "Simplifying..."
-              : !prompt.trim()
-                ? "Enter a topic first"
-                : "Simplify Lesson"}
+            {isLoading ? "Generating lesson..." : "Simplify Lesson"}
           </button>
         </section>
 

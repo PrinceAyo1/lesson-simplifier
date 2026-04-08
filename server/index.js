@@ -1,11 +1,16 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const OpenAI = require("openai");
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 app.use(
   cors({
@@ -19,38 +24,80 @@ app.get("/api/health", (req, res) => {
   res.json({ message: "Server is running" });
 });
 
-app.post("/api/generate", (req, res) => {
-  const { prompt, subject, difficulty } = req.body;
+app.post("/api/generate", async (req, res) => {
+  try {
+    const { prompt, subject, difficulty } = req.body;
 
-  if (!prompt || !subject || !difficulty) {
-    return res.status(400).json({
-      error: "Prompt, subject, and difficulty are required.",
+    if (!prompt || !subject || !difficulty) {
+      return res.status(400).json({
+        error: "Prompt, subject, and difficulty are required.",
+      });
+    }
+
+    const systemPrompt = `
+You are Lesson Simplifier, an AI assistant for FE teachers, Functional Skills teachers, adult learning tutors, ALS staff, and trainee teachers in the UK.
+
+Your job is to simplify teaching content for learners at the requested level.
+
+Rules:
+- Use plain English
+- Be step-by-step
+- Keep the tone supportive and teacher-friendly
+- Use UK-relevant real-life examples
+- Match the requested subject and difficulty
+- Return exactly 3 mini tasks
+- Make the explanation usable in class immediately
+- Do not include markdown
+- Return valid JSON only
+
+Required JSON shape:
+{
+  "simpleExplanation": ["string", "string", "string"],
+  "examples": ["string", "string", "string"],
+  "miniTasks": [
+    { "question": "string", "answer": "string" },
+    { "question": "string", "answer": "string" },
+    { "question": "string", "answer": "string" }
+  ]
+}
+`;
+
+    const userPrompt = `
+Teaching request: ${prompt}
+Subject: ${subject}
+Difficulty: ${difficulty}
+
+Generate:
+1. A very simple explanation
+2. Real-life examples relevant to UK learners
+3. Three mini practice tasks with answers
+`;
+
+    const response = await client.chat.completions.create({
+      model: "gpt-4o-mini",
+      temperature: 0.7,
+      response_format: { type: "json_object" },
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
+      ],
+    });
+
+    const content = response.choices?.[0]?.message?.content;
+
+    if (!content) {
+      throw new Error("No content returned from OpenAI");
+    }
+
+    const parsed = JSON.parse(content);
+
+    return res.json(parsed);
+  } catch (error) {
+    console.error("Generate error:", error);
+    return res.status(500).json({
+      error: "Failed to generate lesson content.",
     });
   }
-
-  res.json({
-    simpleExplanation: [
-      "A percentage means an amount out of 100.",
-      "50% means 50 out of 100.",
-      "You can also think of 50% as one half.",
-      "To find a percentage, you work out that part of the total.",
-    ],
-    examples: [
-      "If a £10 item has 20% off, 20% of £10 is £2, so the new price is £8.",
-      "If you score 8 out of 10 in a quiz, that is 80%.",
-      "If half the class is present, that means 50% of the class is there.",
-    ],
-    miniTasks: [
-      { question: "What is 10% of 50?", answer: "5" },
-      { question: "What is 25% of 40?", answer: "10" },
-      { question: "What is 50% of 18?", answer: "9" },
-    ],
-    meta: {
-      prompt,
-      subject,
-      difficulty,
-    },
-  });
 });
 
 app.listen(PORT, () => {
