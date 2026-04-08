@@ -1,25 +1,6 @@
 import { useState } from "react";
 import "./GeneratorPage.css";
 
-const mockLesson = {
-  simpleExplanation: [
-    "A percentage means an amount out of 100.",
-    "50% means 50 out of 100.",
-    "You can also think of 50% as one half.",
-    "To find a percentage, you work out that part of the total.",
-  ],
-  examples: [
-    "If a £10 item has 20% off, 20% of £10 is £2, so the new price is £8.",
-    "If you score 8 out of 10 in a quiz, that is 80%.",
-    "If half the class is present, that means 50% of the class is there.",
-  ],
-  miniTasks: [
-    { question: "What is 10% of 50?", answer: "5" },
-    { question: "What is 25% of 40?", answer: "10" },
-    { question: "What is 50% of 18?", answer: "9" },
-  ],
-};
-
 function OutputCard({ title, children }) {
   return (
     <section className="output-section-card">
