@@ -1,9 +1,11 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const OpenAI = require("openai");
 
 dotenv.config();
+
+const OpenAI = require("openai");
+const supabase = require("./config/supabase");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -96,6 +98,64 @@ Generate:
     console.error("Generate error:", error);
     return res.status(500).json({
       error: "Failed to generate lesson content.",
+    });
+  }
+});
+
+app.post("/api/lessons", async (req, res) => {
+  try {
+    const {
+      userId,
+      prompt,
+      subject,
+      difficulty,
+      simpleExplanation,
+      examples,
+      miniTasks,
+    } = req.body;
+
+    if (
+      !userId ||
+      !prompt ||
+      !subject ||
+      !difficulty ||
+      !simpleExplanation ||
+      !examples ||
+      !miniTasks
+    ) {
+      return res.status(400).json({
+        error: "Missing required lesson fields.",
+      });
+    }
+
+    const { data, error } = await supabase
+      .from("lessons")
+      .insert([
+        {
+          user_id: userId,
+          prompt,
+          subject,
+          difficulty,
+          simple_explanation: simpleExplanation,
+          examples,
+          mini_tasks: miniTasks,
+        },
+      ])
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Supabase save error:", error);
+      return res.status(500).json({
+        error: "Failed to save lesson.",
+      });
+    }
+
+    return res.status(201).json(data);
+  } catch (error) {
+    console.error("Save lesson error:", error);
+    return res.status(500).json({
+      error: "Something went wrong while saving the lesson.",
     });
   }
 });

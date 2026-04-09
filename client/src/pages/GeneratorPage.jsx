@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./GeneratorPage.css";
+import { supabase } from "../services/supabase";
 
 function OutputCard({ title, children }) {
   return (
@@ -39,6 +40,7 @@ export default function GeneratorPage() {
   const [lesson, setLesson] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleGenerate = async () => {
     try {
@@ -106,6 +108,51 @@ ${lesson.miniTasks
     } catch (error) {
       console.error("Copy failed:", error);
       alert("Copy failed. Please try again.");
+    }
+  };
+
+  const handleSaveLesson = async () => {
+    try {
+      if (!lesson) return;
+
+      setIsSaving(true);
+
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError || !user) {
+        alert("Please log in to save lessons.");
+        return;
+      }
+
+      const response = await fetch("http://localhost:5000/api/lessons", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          prompt,
+          subject,
+          difficulty,
+          simpleExplanation: lesson.simpleExplanation,
+          examples: lesson.examples,
+          miniTasks: lesson.miniTasks,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save lesson");
+      }
+
+      alert("Lesson saved");
+    } catch (error) {
+      console.error(error);
+      alert("Could not save lesson.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -196,7 +243,13 @@ ${lesson.miniTasks
                 <button className="secondary-action-btn" onClick={handleCopy}>
                   {copied ? "Copied!" : "Copy"}
                 </button>
-                <button className="secondary-action-btn">Save</button>
+                <button
+                  className="secondary-action-btn"
+                  onClick={handleSaveLesson}
+                  disabled={isSaving}
+                >
+                  {isSaving ? "Saving..." : "Save"}
+                </button>
                 <button className="secondary-action-btn">Export PDF</button>
               </div>
             </div>
