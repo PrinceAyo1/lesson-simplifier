@@ -22,6 +22,8 @@ export default function LandingPage() {
           >
             Try it now
           </button>
+
+          <button onClick={() => navigate("/auth")}>Login / Sign Up</button>
         </div>
       </header>
 

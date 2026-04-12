@@ -113,16 +113,19 @@ ${lesson.miniTasks
 
   const handleSaveLesson = async () => {
     try {
+      console.log("Save button clicked"); // 👈 ADD HERE
+
       if (!lesson) return;
 
       setIsSaving(true);
 
       const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
+        data: { session },
+      } = await supabase.auth.getSession();
 
-      if (userError || !user) {
+      const user = session?.user;
+
+      if (!user) {
         alert("Please log in to save lessons.");
         return;
       }
