@@ -37,25 +37,41 @@ app.post("/api/generate", async (req, res) => {
     }
 
     const systemPrompt = `
-You are Lesson Simplifier, an AI assistant for FE teachers, Functional Skills teachers, adult learning tutors, ALS staff, and trainee teachers in the UK.
+You are Lesson Simplifier, an AI assistant that helps learners, teachers, tutors, parents, and support staff understand difficult topics more easily.
 
-Your job is to simplify teaching content for learners at the requested level.
+Your job is to simplify topics for the requested level.
 
 Rules:
 - Use plain English
 - Be step-by-step
-- Keep the tone supportive and teacher-friendly
-- Use UK-relevant real-life examples
+- Keep the tone supportive and easy to follow
+- Use UK-relevant real-life examples where useful
 - Match the requested subject and difficulty
 - Return exactly 3 mini tasks
-- Make the explanation usable in class immediately
 - Do not include markdown
 - Return valid JSON only
+
+Important:
+- If the subject is Maths or the topic involves calculations, you must include proper worked examples with clear step-by-step working out.
+- Do not give answer-only maths examples.
+- For calculation topics, show the method clearly before the final answer.
+- For non-calculation topics, still return workedExamples, but make them simple guided examples.
 
 Required JSON shape:
 {
   "simpleExplanation": ["string", "string", "string"],
-  "examples": ["string", "string", "string"],
+  "workedExamples": [
+    {
+      "question": "string",
+      "steps": ["string", "string", "string"],
+      "answer": "string"
+    },
+    {
+      "question": "string",
+      "steps": ["string", "string", "string"],
+      "answer": "string"
+    }
+  ],
   "miniTasks": [
     { "question": "string", "answer": "string" },
     { "question": "string", "answer": "string" },
@@ -65,14 +81,18 @@ Required JSON shape:
 `;
 
     const userPrompt = `
-Teaching request: ${prompt}
+Topic/request: ${prompt}
 Subject: ${subject}
 Difficulty: ${difficulty}
 
 Generate:
-1. A very simple explanation
-2. Real-life examples relevant to UK learners
+1. A very simple explanation in plain English
+2. Two worked examples
+   - If the topic is calculation-based, include full working out step by step
+   - If the topic is not calculation-based, include guided examples with clear steps
 3. Three mini practice tasks with answers
+
+Make the output easy to use for learning, revision, teaching, or support at home.
 `;
 
     const response = await client.chat.completions.create({
@@ -93,7 +113,13 @@ Generate:
 
     const parsed = JSON.parse(content);
 
-    return res.json(parsed);
+    const safeResponse = {
+      simpleExplanation: parsed.simpleExplanation || [],
+      workedExamples: parsed.workedExamples || [],
+      miniTasks: parsed.miniTasks || [],
+    };
+
+    return res.json(safeResponse);
   } catch (error) {
     console.error("Generate error:", error);
     return res.status(500).json({
@@ -110,7 +136,7 @@ app.post("/api/lessons", async (req, res) => {
       subject,
       difficulty,
       simpleExplanation,
-      examples,
+      workedExamples,
       miniTasks,
     } = req.body;
 
@@ -120,7 +146,7 @@ app.post("/api/lessons", async (req, res) => {
       !subject ||
       !difficulty ||
       !simpleExplanation ||
-      !examples ||
+      !workedExamples ||
       !miniTasks
     ) {
       return res.status(400).json({
@@ -137,7 +163,7 @@ app.post("/api/lessons", async (req, res) => {
           subject,
           difficulty,
           simple_explanation: simpleExplanation,
-          examples,
+          worked_examples: workedExamples,
           mini_tasks: miniTasks,
         },
       ])

@@ -87,8 +87,16 @@ Difficulty: ${difficulty}
 Simple Explanation:
 ${lesson.simpleExplanation.map((item, index) => `${index + 1}. ${item}`).join("\n")}
 
-Examples:
-${lesson.examples.map((item, index) => `${index + 1}. ${item}`).join("\n")}
+
+Worked Examples:
+${lesson.workedExamples
+  .map(
+    (example, index) =>
+      `${index + 1}. ${example.question}\n` +
+      `${example.steps.map((step, stepIndex) => `   ${stepIndex + 1}. ${step}`).join("\n")}\n` +
+      `Answer: ${example.answer}`,
+  )
+  .join("\n\n")}
 
 Mini Tasks:
 ${lesson.miniTasks
@@ -141,7 +149,7 @@ ${lesson.miniTasks
           subject,
           difficulty,
           simpleExplanation: lesson.simpleExplanation,
-          examples: lesson.examples,
+          workedExamples: lesson.workedExamples,
           miniTasks: lesson.miniTasks,
         }),
       });
@@ -270,12 +278,29 @@ ${lesson.miniTasks
                 </ul>
               </OutputCard>
 
-              <OutputCard title="Examples">
-                <ul className="output-list">
-                  {lesson.examples.map((item, index) => (
-                    <li key={index}>{item}</li>
+              <OutputCard title="Worked Examples">
+                <div className="worked-examples-list">
+                  {lesson.workedExamples?.map((example, index) => (
+                    <div key={index} className="worked-example-item">
+                      <p className="worked-example-question">
+                        <strong>Question:</strong> {example.question}
+                      </p>
+
+                      <div className="worked-example-steps">
+                        <strong>Working:</strong>
+                        <ul className="output-list">
+                          {example.steps?.map((step, stepIndex) => (
+                            <li key={stepIndex}>{step}</li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <p className="worked-example-answer">
+                        <strong>Answer:</strong> {example.answer}
+                      </p>
+                    </div>
                   ))}
-                </ul>
+                </div>
               </OutputCard>
 
               <OutputCard title="Mini Tasks">

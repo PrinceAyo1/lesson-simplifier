@@ -245,3 +245,27 @@
     align-items: start;
   }
 }
+.worked-examples-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.worked-example-item {
+  background: var(--surface-muted);
+  border-radius: 18px;
+  padding: 1rem;
+}
+
+.worked-example-question {
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.worked-example-steps {
+  margin-bottom: 0.75rem;
+}
+
+.worked-example-answer {
+  color: var(--text);
+  font-weight: 600;
+}
