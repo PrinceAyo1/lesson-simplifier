@@ -163,23 +163,23 @@ ${lesson.miniTasks
     <main className="generator-page">
       <div className="generator-container">
         <section className="generator-header">
-          <p className="generator-eyebrow">Lesson Generator</p>
-          <h1>Simplify a topic for your learners</h1>
+          <p className="generator-eyebrow">Topic Simplifier</p>
+          <h1>Make a difficult topic easier to understand</h1>
           <p className="generator-subtext">
-            Enter a teaching request and generate a simple explanation,
-            classroom-ready examples, and mini tasks in seconds.
+            Enter a topic or question and generate a simple explanation,
+            practical examples, and mini tasks in seconds.
           </p>
         </section>
 
         <section className="generator-input-card">
           <label className="input-label" htmlFor="lesson-prompt">
-            What would you like to teach?
+            What would you like help with?
           </label>
 
           <textarea
             id="lesson-prompt"
             className="generator-textarea"
-            placeholder="e.g. Teach percentages to a weak Level 1 student"
+            placeholder="e.g. Explain percentages for a Level 1 learner"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             rows="5"
@@ -188,10 +188,10 @@ ${lesson.miniTasks
           <p
             className="example-prompt"
             onClick={() =>
-              setPrompt("Teach percentages to a weak Level 1 student")
+              setPrompt("Explain percentages for a Level 1 learner")
             }
           >
-            Try: "Teach percentages to a weak Level 1 student"
+            Try: "Explain percentages for a Level 1 learner"
           </p>
 
           <div className="generator-controls">
@@ -229,7 +229,11 @@ ${lesson.miniTasks
             onClick={handleGenerate}
             disabled={isLoading || !prompt.trim()}
           >
-            {isLoading ? "Generating lesson..." : "Simplify Lesson"}
+            {isLoading
+              ? "Simplifying..."
+              : !prompt.trim()
+                ? "Enter a topic first"
+                : "Simplify Topic"}
           </button>
         </section>
 

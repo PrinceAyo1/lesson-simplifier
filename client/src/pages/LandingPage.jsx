@@ -22,8 +22,6 @@ export default function LandingPage() {
           >
             Try it now
           </button>
-
-          <button onClick={() => navigate("/auth")}>Login / Sign Up</button>
         </div>
       </header>
 
@@ -32,15 +30,17 @@ export default function LandingPage() {
           <div className="container hero__grid">
             <div className="hero__content">
               <div className="hero__badge">
-                Built for FE, Functional Skills and adult learning
+                For learners, teachers, tutors and parents
               </div>
 
-              <h1 className="hero__title">Simplify Your Lesson in Seconds</h1>
+              <h1 className="hero__title">
+                Make Difficult Topics Easier to Understand
+              </h1>
 
               <p className="hero__text">
-                Turn complex topics into clear, step-by-step explanations with
-                UK-relevant examples and quick classroom tasks for different
-                learner levels.
+                Turn complex topics into clear, step-by-step explanations,
+                practical examples, and simple practice tasks for different
+                levels.
               </p>
 
               <div className="hero__actions">
@@ -48,7 +48,7 @@ export default function LandingPage() {
                   className="hero__primary"
                   onClick={() => navigate("/app/generate")}
                 >
-                  Simplify a lesson
+                  Simplify a topic
                 </button>
 
                 <button
@@ -66,14 +66,14 @@ export default function LandingPage() {
 
             <div className="hero__preview">
               <div className="preview-card">
-                <div className="preview-label">Teaching request</div>
+                <div className="preview-label">Learning request</div>
                 <div className="preview-title">
-                  Teach percentages to a weak Level 1 student
+                  Explain percentages for a Level 1 learner
                 </div>
                 <div className="preview-list">
                   <div>Subject: Maths</div>
                   <div>Level: Level 1</div>
-                  <div>Format: Simple explanation + examples + mini tasks</div>
+                  <div>Format: Explanation + examples + mini tasks</div>
                 </div>
               </div>
 
@@ -102,15 +102,17 @@ export default function LandingPage() {
         <section className="features" id="features">
           <div className="container features__grid">
             <article className="feature-card">
-              <h3 className="feature-card__title">Save planning time</h3>
+              <h3 className="feature-card__title">Clearer understanding</h3>
               <p className="feature-card__text">
-                Generate simplified teaching content in seconds instead of
-                rewriting lessons manually.
+                Break difficult topics into simpler language and manageable
+                steps.
               </p>
             </article>
 
             <article className="feature-card">
-              <h3 className="feature-card__title">Different learner levels</h3>
+              <h3 className="feature-card__title">
+                Different levels supported
+              </h3>
               <p className="feature-card__text">
                 Adapt explanations for Entry Level, Level 1, Level 2 and GCSE
                 pathways.
@@ -118,10 +120,12 @@ export default function LandingPage() {
             </article>
 
             <article className="feature-card">
-              <h3 className="feature-card__title">Classroom-ready output</h3>
+              <h3 className="feature-card__title">
+                Useful for learning and revision
+              </h3>
               <p className="feature-card__text">
-                Get plain English explanations, real-life examples and mini
-                practice tasks teachers can use straight away.
+                Get explanations, examples and practice tasks that are easy to
+                use for study, teaching or support at home.
               </p>
             </article>
           </div>
@@ -132,11 +136,11 @@ export default function LandingPage() {
             <div className="section-heading">
               <p className="section-heading__eyebrow">See how it works</p>
               <h2 className="section-heading__title">
-                A clear lesson output teachers can use immediately
+                A clear output for learning, revision and support
               </h2>
               <p className="section-heading__text">
-                Every response is structured to reduce prep time and support
-                learners who need simpler explanations without losing meaning.
+                Every response is designed to make difficult ideas easier to
+                follow without losing the key meaning.
               </p>
             </div>
 
@@ -175,10 +179,10 @@ export default function LandingPage() {
           <div className="container">
             <div className="cta-banner__inner">
               <div>
-                <h2>Support your learners without doubling your workload</h2>
+                <h2>Get clear explanations without the stress</h2>
                 <p>
-                  Create calmer, clearer lesson materials for mixed-ability
-                  classrooms in just a few clicks.
+                  Use Lesson Simplifier to make learning, revision and topic
+                  support faster and easier.
                 </p>
               </div>
 
@@ -195,7 +199,7 @@ export default function LandingPage() {
           <div>
             <div className="footer__brand">Lesson Simplifier</div>
             <p className="footer__text">
-              AI support for teachers who need faster, clearer lesson prep.
+              AI support for clearer understanding, learning and revision.
             </p>
           </div>
 
