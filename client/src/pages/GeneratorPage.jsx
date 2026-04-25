@@ -1,6 +1,8 @@
 import { useState } from "react";
 import "./GeneratorPage.css";
 import { supabase } from "../services/supabase";
+import { useNavigate } from "react-router-dom";
+import AppHeader from "../components/AppHeader";
 
 function OutputCard({ title, children }) {
   return (
@@ -41,6 +43,7 @@ export default function GeneratorPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const navigate = useNavigate();
 
   const handleGenerate = async () => {
     try {
@@ -168,156 +171,166 @@ ${lesson.miniTasks
   };
 
   return (
-    <main className="generator-page">
-      <div className="generator-container">
-        <section className="generator-header">
-          <p className="generator-eyebrow">Topic Simplifier</p>
-          <h1>Make a difficult topic easier to understand</h1>
-          <p className="generator-subtext">
-            Enter a topic or question and generate a simple explanation,
-            practical examples, and mini tasks in seconds.
-          </p>
-        </section>
-
-        <section className="generator-input-card">
-          <label className="input-label" htmlFor="lesson-prompt">
-            What would you like help with?
-          </label>
-
-          <textarea
-            id="lesson-prompt"
-            className="generator-textarea"
-            placeholder="e.g. Explain percentages for a Level 1 learner"
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            rows="5"
-          />
-
-          <p
-            className="example-prompt"
-            onClick={() =>
-              setPrompt("Explain percentages for a Level 1 learner")
-            }
-          >
-            Try: "Explain percentages for a Level 1 learner"
-          </p>
-
-          <div className="generator-controls">
-            <div className="form-group">
-              <label htmlFor="subject">Subject</label>
-              <select
-                id="subject"
-                value={subject}
-                onChange={(e) => setSubject(e.target.value)}
-              >
-                <option>Maths</option>
-                <option>English</option>
-                <option>General explanation</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="difficulty">Difficulty</label>
-              <select
-                id="difficulty"
-                value={difficulty}
-                onChange={(e) => setDifficulty(e.target.value)}
-              >
-                <option>Entry Level</option>
-                <option>Level 1</option>
-                <option>Level 2</option>
-                <option>GCSE Foundation Tier</option>
-                <option>GCSE Higher Tier</option>
-              </select>
-            </div>
+    <>
+      <AppHeader />
+      <main className="generator-page">
+        <div className="generator-container">
+          <section className="generator-header">
+            <p className="generator-eyebrow">Topic Simplifier</p>
+            <h1>Make a difficult topic easier to understand</h1>
+            <p className="generator-subtext">
+              Enter a topic or question and generate a simple explanation,
+              practical examples, and mini tasks in seconds.
+            </p>
+          </section>
+          <div className="generator-top-actions">
+            <button
+              className="secondary-action-btn"
+              onClick={() => navigate("/app/saved")}
+            >
+              View Saved Lessons
+            </button>
           </div>
+          <section className="generator-input-card">
+            <label className="input-label" htmlFor="lesson-prompt">
+              What would you like help with?
+            </label>
 
-          <button
-            className="generate-btn"
-            onClick={handleGenerate}
-            disabled={isLoading || !prompt.trim()}
-          >
-            {isLoading
-              ? "Simplifying..."
-              : !prompt.trim()
-                ? "Enter a topic first"
-                : "Simplify Topic"}
-          </button>
-        </section>
+            <textarea
+              id="lesson-prompt"
+              className="generator-textarea"
+              placeholder="e.g. Explain percentages for a Level 1 learner"
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              rows="5"
+            />
 
-        <section className="generator-meta">
-          <div className="meta-pill">Subject: {subject}</div>
-          <div className="meta-pill">Difficulty: {difficulty}</div>
-        </section>
+            <p
+              className="example-prompt"
+              onClick={() =>
+                setPrompt("Explain percentages for a Level 1 learner")
+              }
+            >
+              Try: "Explain percentages for a Level 1 learner"
+            </p>
 
-        {lesson && (
-          <section className="generator-output">
-            <div className="output-topbar">
-              <h2>Your lesson output</h2>
-              <div className="output-actions">
-                <button className="secondary-action-btn" onClick={handleCopy}>
-                  {copied ? "Copied!" : "Copy"}
-                </button>
-                <button
-                  className="secondary-action-btn"
-                  onClick={handleSaveLesson}
-                  disabled={isSaving}
+            <div className="generator-controls">
+              <div className="form-group">
+                <label htmlFor="subject">Subject</label>
+                <select
+                  id="subject"
+                  value={subject}
+                  onChange={(e) => setSubject(e.target.value)}
                 >
-                  {isSaving ? "Saving..." : "Save"}
-                </button>
-                <button className="secondary-action-btn">Export PDF</button>
+                  <option>Maths</option>
+                  <option>English</option>
+                  <option>General explanation</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="difficulty">Difficulty</label>
+                <select
+                  id="difficulty"
+                  value={difficulty}
+                  onChange={(e) => setDifficulty(e.target.value)}
+                >
+                  <option>Entry Level</option>
+                  <option>Level 1</option>
+                  <option>Level 2</option>
+                  <option>GCSE Foundation Tier</option>
+                  <option>GCSE Higher Tier</option>
+                </select>
               </div>
             </div>
 
-            <div className="output-grid">
-              <OutputCard title="Simple Explanation">
-                <ul className="output-list">
-                  {lesson.simpleExplanation.map((item, index) => (
-                    <li key={index}>{item}</li>
-                  ))}
-                </ul>
-              </OutputCard>
-
-              <OutputCard title="Worked Examples">
-                <div className="worked-examples-list">
-                  {lesson.workedExamples?.map((example, index) => (
-                    <div key={index} className="worked-example-item">
-                      <p className="worked-example-question">
-                        <strong>Question:</strong> {example.question}
-                      </p>
-
-                      <div className="worked-example-steps">
-                        <strong>Working:</strong>
-                        <ul className="output-list">
-                          {example.steps?.map((step, stepIndex) => (
-                            <li key={stepIndex}>{step}</li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      <p className="worked-example-answer">
-                        <strong>Answer:</strong> {example.answer}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </OutputCard>
-
-              <OutputCard title="Mini Tasks">
-                <div className="tasks-list">
-                  {lesson.miniTasks.map((task, index) => (
-                    <TaskItem
-                      key={index}
-                      question={task.question}
-                      answer={task.answer}
-                    />
-                  ))}
-                </div>
-              </OutputCard>
-            </div>
+            <button
+              className="generate-btn"
+              onClick={handleGenerate}
+              disabled={isLoading || !prompt.trim()}
+            >
+              {isLoading
+                ? "Simplifying..."
+                : !prompt.trim()
+                  ? "Enter a topic first"
+                  : "Simplify Topic"}
+            </button>
           </section>
-        )}
-      </div>
-    </main>
+
+          <section className="generator-meta">
+            <div className="meta-pill">Subject: {subject}</div>
+            <div className="meta-pill">Difficulty: {difficulty}</div>
+          </section>
+
+          {lesson && (
+            <section className="generator-output">
+              <div className="output-topbar">
+                <h2>Your lesson output</h2>
+                <div className="output-actions">
+                  <button className="secondary-action-btn" onClick={handleCopy}>
+                    {copied ? "Copied!" : "Copy"}
+                  </button>
+                  <button
+                    className="secondary-action-btn"
+                    onClick={handleSaveLesson}
+                    disabled={isSaving}
+                  >
+                    {isSaving ? "Saving..." : "Save"}
+                  </button>
+                  <button className="secondary-action-btn">Export PDF</button>
+                </div>
+              </div>
+
+              <div className="output-grid">
+                <OutputCard title="Simple Explanation">
+                  <ul className="output-list">
+                    {lesson.simpleExplanation.map((item, index) => (
+                      <li key={index}>{item}</li>
+                    ))}
+                  </ul>
+                </OutputCard>
+
+                <OutputCard title="Worked Examples">
+                  <div className="worked-examples-list">
+                    {lesson.workedExamples?.map((example, index) => (
+                      <div key={index} className="worked-example-item">
+                        <p className="worked-example-question">
+                          <strong>Question:</strong> {example.question}
+                        </p>
+
+                        <div className="worked-example-steps">
+                          <strong>Working:</strong>
+                          <ul className="output-list">
+                            {example.steps?.map((step, stepIndex) => (
+                              <li key={stepIndex}>{step}</li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        <p className="worked-example-answer">
+                          <strong>Answer:</strong> {example.answer}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </OutputCard>
+
+                <OutputCard title="Mini Tasks">
+                  <div className="tasks-list">
+                    {lesson.miniTasks.map((task, index) => (
+                      <TaskItem
+                        key={index}
+                        question={task.question}
+                        answer={task.answer}
+                      />
+                    ))}
+                  </div>
+                </OutputCard>
+              </div>
+            </section>
+          )}
+        </div>
+      </main>
+    </>
   );
 }

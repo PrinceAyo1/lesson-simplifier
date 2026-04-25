@@ -185,6 +185,53 @@ app.post("/api/lessons", async (req, res) => {
     });
   }
 });
+app.get("/api/lessons/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const { data, error } = await supabase
+      .from("lessons")
+      .select("*")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Fetch lessons error:", error);
+      return res.status(500).json({
+        error: "Failed to fetch lessons.",
+      });
+    }
+
+    return res.json(data);
+  } catch (error) {
+    console.error("Get lessons route error:", error);
+    return res.status(500).json({
+      error: "Something went wrong while fetching lessons.",
+    });
+  }
+});
+
+app.delete("/api/lessons/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const { error } = await supabase.from("lessons").delete().eq("id", id);
+
+    if (error) {
+      console.error("Delete lesson error:", error);
+      return res.status(500).json({
+        error: "Failed to delete lesson.",
+      });
+    }
+
+    return res.json({ message: "Lesson deleted successfully." });
+  } catch (error) {
+    console.error("Delete route error:", error);
+    return res.status(500).json({
+      error: "Something went wrong while deleting the lesson.",
+    });
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

@@ -269,3 +269,9 @@
   color: var(--text);
   font-weight: 600;
 }
+
+.generator-top-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
