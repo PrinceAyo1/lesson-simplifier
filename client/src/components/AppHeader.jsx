@@ -11,21 +11,29 @@ export default function AppHeader() {
   };
 
   return (
-    <header className="app-header">
-      <div className="app-header__inner">
-        <Link to="/" className="app-header__brand">
-          Topic Simplifier
-        </Link>
+    <>
+      <header className="app-header">
+        <div className="app-header__inner">
+          <Link to="/" className="app-header__brand">
+            Topic Simplifier
+          </Link>
 
-        <nav className="app-header__nav">
-          <Link to="/app/generate">Generate</Link>
-          <Link to="/app/saved">Saved Lessons</Link>
-        </nav>
+          <nav className="app-header__nav">
+            <Link to="/app/generate">Generate</Link>
+            <Link to="/app/saved">Saved Lessons</Link>
+          </nav>
 
-        <button className="app-header__logout" onClick={handleLogout}>
-          Logout
-        </button>
-      </div>
-    </header>
+          <button className="app-header__logout" onClick={handleLogout}>
+            Logout
+          </button>
+        </div>
+      </header>
+
+      <nav className="mobile-bottom-nav">
+        <Link to="/">Home</Link>
+        <Link to="/app/generate">Generate</Link>
+        <Link to="/app/saved">Saved</Link>
+      </nav>
+    </>
   );
 }
