@@ -1,52 +1,41 @@
 import { useState } from "react";
-import "./GeneratorPage.css";
-import { supabase } from "../services/supabase";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "../services/supabase";
 import AppHeader from "../components/AppHeader";
-
-function OutputCard({ title, children }) {
-  return (
-    <section className="output-section-card">
-      <h2>{title}</h2>
-      {children}
-    </section>
-  );
-}
-
-function TaskItem({ question, answer }) {
-  const [showAnswer, setShowAnswer] = useState(false);
-
-  return (
-    <div className="task-item">
-      <p className="task-question">{question}</p>
-      <button
-        className="toggle-answer-btn"
-        onClick={() => setShowAnswer((prev) => !prev)}
-      >
-        {showAnswer ? "Hide answer" : "Show answer"}
-      </button>
-
-      {showAnswer && (
-        <p className="task-answer">
-          <strong>Answer:</strong> {answer}
-        </p>
-      )}
-    </div>
-  );
-}
+import "./GeneratorPage.css";
 
 export default function GeneratorPage() {
+  const navigate = useNavigate();
+
   const [prompt, setPrompt] = useState("");
   const [subject, setSubject] = useState("Maths");
   const [difficulty, setDifficulty] = useState("Level 1");
-  const [lesson, setLesson] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const navigate = useNavigate();
 
-  const handleGenerate = async () => {
+  const [lesson, setLesson] = useState(null);
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const [message, setMessage] = useState({
+    type: "",
+    text: "",
+  });
+
+  const showMessage = (type, text) => {
+    setMessage({ type, text });
+
+    setTimeout(() => {
+      setMessage({
+        type: "",
+        text: "",
+      });
+    }, 3000);
+  };
+
+  const handleGenerateLesson = async () => {
     try {
+      if (!prompt.trim()) return;
+
       setIsLoading(true);
 
       const response = await fetch("http://localhost:5000/api/generate", {
@@ -61,71 +50,71 @@ export default function GeneratorPage() {
         }),
       });
 
+      const result = await response.json();
+
       if (!response.ok) {
-        throw new Error("Failed to generate lesson");
+        throw new Error(result.error || "Generation failed");
       }
 
-      const data = await response.json();
-
-      setLesson(data);
+      setLesson(result);
     } catch (error) {
       console.error(error);
-      alert("Something went wrong. Try again.");
+
+      showMessage("error", "Something went wrong. Try again.");
     } finally {
       setIsLoading(false);
     }
   };
+
   const handleCopy = async () => {
-    if (!lesson) return;
+    try {
+      if (!lesson) return;
 
-    const formattedText = `
-Lesson Simplifier Output
-
-Teaching Request:
+      const formattedLesson = `
+TOPIC:
 ${prompt}
 
-Subject: ${subject}
-Difficulty: ${difficulty}
+SUBJECT:
+${subject}
 
-Simple Explanation:
-${lesson.simpleExplanation.map((item, index) => `${index + 1}. ${item}`).join("\n")}
+LEVEL:
+${difficulty}
 
+SIMPLE EXPLANATION:
+${lesson.simpleExplanation.join("\n")}
 
-Worked Examples:
+WORKED EXAMPLES:
 ${lesson.workedExamples
   .map(
     (example, index) =>
       `${index + 1}. ${example.question}\n` +
-      `${example.steps.map((step, stepIndex) => `   ${stepIndex + 1}. ${step}`).join("\n")}\n` +
+      `${example.steps
+        .map((step, stepIndex) => `   ${stepIndex + 1}. ${step}`)
+        .join("\n")}\n` +
       `Answer: ${example.answer}`,
   )
   .join("\n\n")}
 
-Mini Tasks:
+MINI TASKS:
 ${lesson.miniTasks
   .map(
     (task, index) => `${index + 1}. ${task.question}\nAnswer: ${task.answer}`,
   )
   .join("\n\n")}
-  `.trim();
+`;
 
-    try {
-      await navigator.clipboard.writeText(formattedText);
-      setCopied(true);
+      await navigator.clipboard.writeText(formattedLesson);
 
-      setTimeout(() => {
-        setCopied(false);
-      }, 2000);
+      showMessage("success", "Lesson copied to clipboard");
     } catch (error) {
-      console.error("Copy failed:", error);
-      alert("Copy failed. Please try again.");
+      console.error(error);
+
+      showMessage("error", "Copy failed. Please try again.");
     }
   };
 
   const handleSaveLesson = async () => {
     try {
-      console.log("Save button clicked"); // 👈 ADD HERE
-
       if (!lesson) return;
 
       setIsSaving(true);
@@ -137,7 +126,7 @@ ${lesson.miniTasks
       const user = session?.user;
 
       if (!user) {
-        alert("Please log in to save lessons.");
+        showMessage("error", "Please log in to save lessons.");
         return;
       }
 
@@ -157,14 +146,17 @@ ${lesson.miniTasks
         }),
       });
 
+      const result = await response.json();
+
       if (!response.ok) {
-        throw new Error("Failed to save lesson");
+        throw new Error(result.error || "Failed to save lesson");
       }
 
-      alert("Lesson saved");
+      showMessage("success", "Lesson saved");
     } catch (error) {
       console.error(error);
-      alert("Could not save lesson.");
+
+      showMessage("error", error.message || "Could not save lesson.");
     } finally {
       setIsSaving(false);
     }
@@ -173,16 +165,26 @@ ${lesson.miniTasks
   return (
     <>
       <AppHeader />
+
       <main className="generator-page">
         <div className="generator-container">
           <section className="generator-header">
             <p className="generator-eyebrow">Topic Simplifier</p>
+
             <h1>Make a difficult topic easier to understand</h1>
+
             <p className="generator-subtext">
               Enter a topic or question and generate a simple explanation,
               practical examples, and mini tasks in seconds.
             </p>
           </section>
+
+          {message.text && (
+            <div className={`app-message app-message--${message.type}`}>
+              {message.text}
+            </div>
+          )}
+
           <div className="generator-top-actions">
             <button
               className="secondary-action-btn"
@@ -191,34 +193,28 @@ ${lesson.miniTasks
               View Saved Lessons
             </button>
           </div>
+
           <section className="generator-input-card">
-            <label className="input-label" htmlFor="lesson-prompt">
-              What would you like help with?
-            </label>
+            <div className="input-group">
+              <label className="input-label" htmlFor="lesson-prompt">
+                What would you like help with?
+              </label>
 
-            <textarea
-              id="lesson-prompt"
-              className="generator-textarea"
-              placeholder="e.g. Explain percentages for a Level 1 learner"
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              rows="5"
-            />
-
-            <p
-              className="example-prompt"
-              onClick={() =>
-                setPrompt("Explain percentages for a Level 1 learner")
-              }
-            >
-              Try: "Explain percentages for a Level 1 learner"
-            </p>
+              <textarea
+                id="lesson-prompt"
+                className="lesson-textarea"
+                placeholder="e.g. Explain percentages for a Level 1 learner"
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+              />
+            </div>
 
             <div className="generator-controls">
-              <div className="form-group">
-                <label htmlFor="subject">Subject</label>
+              <div className="input-group">
+                <label className="input-label">Subject</label>
+
                 <select
-                  id="subject"
+                  className="generator-select"
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
                 >
@@ -228,10 +224,11 @@ ${lesson.miniTasks
                 </select>
               </div>
 
-              <div className="form-group">
-                <label htmlFor="difficulty">Difficulty</label>
+              <div className="input-group">
+                <label className="input-label">Difficulty</label>
+
                 <select
-                  id="difficulty"
+                  className="generator-select"
                   value={difficulty}
                   onChange={(e) => setDifficulty(e.target.value)}
                 >
@@ -246,7 +243,7 @@ ${lesson.miniTasks
 
             <button
               className="generate-btn"
-              onClick={handleGenerate}
+              onClick={handleGenerateLesson}
               disabled={isLoading || !prompt.trim()}
             >
               {isLoading
@@ -257,40 +254,36 @@ ${lesson.miniTasks
             </button>
           </section>
 
-          <section className="generator-meta">
-            <div className="meta-pill">Subject: {subject}</div>
-            <div className="meta-pill">Difficulty: {difficulty}</div>
-          </section>
-
           {lesson && (
-            <section className="generator-output">
-              <div className="output-topbar">
-                <h2>Your lesson output</h2>
-                <div className="output-actions">
-                  <button className="secondary-action-btn" onClick={handleCopy}>
-                    {copied ? "Copied!" : "Copy"}
-                  </button>
-                  <button
-                    className="secondary-action-btn"
-                    onClick={handleSaveLesson}
-                    disabled={isSaving}
-                  >
-                    {isSaving ? "Saving..." : "Save"}
-                  </button>
-                  <button className="secondary-action-btn">Export PDF</button>
-                </div>
+            <section className="output-section">
+              <div className="output-actions">
+                <button className="secondary-action-btn" onClick={handleCopy}>
+                  Copy
+                </button>
+
+                <button
+                  className="secondary-action-btn"
+                  onClick={handleSaveLesson}
+                  disabled={isSaving}
+                >
+                  {isSaving ? "Saving..." : "Save"}
+                </button>
               </div>
 
               <div className="output-grid">
-                <OutputCard title="Simple Explanation">
+                <article className="output-section-card">
+                  <h2>Simple Explanation</h2>
+
                   <ul className="output-list">
-                    {lesson.simpleExplanation.map((item, index) => (
+                    {lesson.simpleExplanation?.map((item, index) => (
                       <li key={index}>{item}</li>
                     ))}
                   </ul>
-                </OutputCard>
+                </article>
 
-                <OutputCard title="Worked Examples">
+                <article className="output-section-card">
+                  <h2>Worked Examples</h2>
+
                   <div className="worked-examples-list">
                     {lesson.workedExamples?.map((example, index) => (
                       <div key={index} className="worked-example-item">
@@ -300,6 +293,7 @@ ${lesson.miniTasks
 
                         <div className="worked-example-steps">
                           <strong>Working:</strong>
+
                           <ul className="output-list">
                             {example.steps?.map((step, stepIndex) => (
                               <li key={stepIndex}>{step}</li>
@@ -313,19 +307,27 @@ ${lesson.miniTasks
                       </div>
                     ))}
                   </div>
-                </OutputCard>
+                </article>
 
-                <OutputCard title="Mini Tasks">
-                  <div className="tasks-list">
-                    {lesson.miniTasks.map((task, index) => (
-                      <TaskItem
-                        key={index}
-                        question={task.question}
-                        answer={task.answer}
-                      />
+                <article className="output-section-card">
+                  <h2>Mini Tasks</h2>
+
+                  <div className="mini-task-list">
+                    {lesson.miniTasks?.map((task, index) => (
+                      <div key={index} className="mini-task-item">
+                        <p>
+                          <strong>Question:</strong> {task.question}
+                        </p>
+
+                        <details>
+                          <summary>Show Answer</summary>
+
+                          <p>{task.answer}</p>
+                        </details>
+                      </div>
                     ))}
                   </div>
-                </OutputCard>
+                </article>
               </div>
             </section>
           )}
