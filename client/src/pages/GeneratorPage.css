@@ -324,3 +324,22 @@
   color: #b42318;
   border-color: #fecdca;
 }
+.app-message {
+  border-radius: 18px;
+  padding: 0.9rem 1rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+
+.app-message--success {
+  background: #ecfdf3;
+  color: #027a48;
+  border-color: #abefc6;
+}
+
+.app-message--error {
+  background: #fef3f2;
+  color: #b42318;
+  border-color: #fecdca;
+}
