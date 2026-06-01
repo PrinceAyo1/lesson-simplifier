@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "../services/supabase";
 import AppHeader from "../components/AppHeader";
 import "./GeneratorPage.css";
+import jsPDF from "jspdf";
 
 function OutputCard({ title, children }) {
   return (
@@ -128,6 +129,70 @@ ${lesson.miniTasks
       console.error("Copy failed:", error);
       showMessage("error", "Copy failed. Please try again.");
     }
+  };
+
+  const handleExportPDF = () => {
+    if (!lesson) return;
+
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const margin = 15;
+    const maxWidth = pageWidth - margin * 2;
+    let y = 20;
+
+    const addText = (text, fontSize = 11, isBold = false) => {
+      doc.setFontSize(fontSize);
+      doc.setFont("helvetica", isBold ? "bold" : "normal");
+
+      const lines = doc.splitTextToSize(text, maxWidth);
+
+      lines.forEach((line) => {
+        if (y > 280) {
+          doc.addPage();
+          y = 20;
+        }
+
+        doc.text(line, margin, y);
+        y += 7;
+      });
+    };
+
+    addText("Topic Simplifier Output", 18, true);
+    y += 5;
+
+    addText(`Request: ${prompt}`, 11, true);
+    addText(`Subject: ${subject}`);
+    addText(`Difficulty: ${difficulty}`);
+    y += 5;
+
+    addText("Simple Explanation", 14, true);
+    lesson.simpleExplanation?.forEach((item, index) => {
+      addText(`${index + 1}. ${item}`);
+    });
+    y += 5;
+
+    addText("Worked Examples", 14, true);
+    lesson.workedExamples?.forEach((example, index) => {
+      addText(`${index + 1}. ${example.question}`, 11, true);
+
+      example.steps?.forEach((step, stepIndex) => {
+        addText(`   ${stepIndex + 1}. ${step}`);
+      });
+
+      addText(`Answer: ${example.answer}`, 11, true);
+      y += 4;
+    });
+
+    addText("Mini Tasks", 14, true);
+    lesson.miniTasks?.forEach((task, index) => {
+      addText(`${index + 1}. ${task.question}`);
+      addText(`Answer: ${task.answer}`, 11, true);
+      y += 3;
+    });
+
+    doc.save("topic-simplifier-output.pdf");
+
+    showMessage("success", "PDF exported");
   };
 
   const handleSaveLesson = async () => {
@@ -297,7 +362,12 @@ ${lesson.miniTasks
                     {isSaving ? "Saving..." : "Save"}
                   </button>
 
-                  <button className="secondary-action-btn">Export PDF</button>
+                  <button
+                    className="secondary-action-btn"
+                    onClick={handleExportPDF}
+                  >
+                    Export PDF
+                  </button>
                 </div>
               </div>
 
