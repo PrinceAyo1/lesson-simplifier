@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../services/supabase";
-import "./SavedLessonsPage.css";
 import AppHeader from "../components/AppHeader";
+import "./SavedLessonsPage.css";
 
 function formatDate(dateString) {
   return new Date(dateString).toLocaleString("en-GB", {
@@ -15,6 +15,15 @@ export default function SavedLessonsPage() {
   const [loading, setLoading] = useState(true);
   const [selectedLesson, setSelectedLesson] = useState(null);
   const [error, setError] = useState("");
+  const [message, setMessage] = useState({ type: "", text: "" });
+
+  const showMessage = (type, text) => {
+    setMessage({ type, text });
+
+    setTimeout(() => {
+      setMessage({ type: "", text: "" });
+    }, 3000);
+  };
 
   const fetchLessons = async () => {
     try {
@@ -78,9 +87,10 @@ export default function SavedLessonsPage() {
       }
 
       setLessons((prev) => prev.filter((lesson) => lesson.id !== lessonId));
+      showMessage("success", "Lesson deleted");
     } catch (err) {
       console.error(err);
-      alert(err.message || "Could not delete lesson.");
+      showMessage("error", err.message || "Could not delete lesson.");
     }
   };
 
@@ -91,6 +101,7 @@ export default function SavedLessonsPage() {
   return (
     <>
       <AppHeader />
+
       <main className="saved-lessons-page">
         <div className="saved-lessons-container">
           <section className="saved-lessons-header">
@@ -101,6 +112,12 @@ export default function SavedLessonsPage() {
               anytime.
             </p>
           </section>
+
+          {message.text && (
+            <div className={`app-message app-message--${message.type}`}>
+              {message.text}
+            </div>
+          )}
 
           {loading && (
             <p className="saved-state-message">Loading saved lessons...</p>
@@ -137,6 +154,7 @@ export default function SavedLessonsPage() {
                   >
                     <div className="saved-lesson-card__top">
                       <h3>{lesson.prompt}</h3>
+
                       <button
                         className="delete-lesson-btn"
                         onClick={(e) => {
@@ -186,6 +204,7 @@ export default function SavedLessonsPage() {
 
                     <div className="saved-detail-card">
                       <h3>Worked Examples</h3>
+
                       <div className="saved-worked-examples">
                         {(selectedLesson.worked_examples || []).map(
                           (example, index) => (
@@ -216,6 +235,7 @@ export default function SavedLessonsPage() {
 
                     <div className="saved-detail-card">
                       <h3>Mini Tasks</h3>
+
                       <div className="saved-mini-tasks">
                         {(selectedLesson.mini_tasks || []).map(
                           (task, index) => (
