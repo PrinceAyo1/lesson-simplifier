@@ -1,11 +1,39 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import jsPDF from "jspdf";
 import { supabase } from "../services/supabase";
 import AppHeader from "../components/AppHeader";
 import "./GeneratorPage.css";
-import jsPDF from "jspdf";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+const levelOptionsBySubject = {
+  Maths: [
+    "Functional Skills Entry Level",
+    "Functional Skills Level 1",
+    "Functional Skills Level 2",
+    "GCSE Foundation",
+    "GCSE Higher",
+    "A Level",
+    "University",
+  ],
+  English: [
+    "Functional Skills Entry Level",
+    "Functional Skills Level 1",
+    "Functional Skills Level 2",
+    "GCSE",
+    "A Level",
+    "University",
+  ],
+  "General explanation": [
+    "Young Learner",
+    "Secondary School",
+    "GCSE",
+    "A Level",
+    "Adult Learner",
+    "University",
+  ],
+};
 
 function OutputCard({ title, children }) {
   return (
@@ -44,11 +72,17 @@ export default function GeneratorPage() {
 
   const [prompt, setPrompt] = useState("");
   const [subject, setSubject] = useState("Maths");
-  const [difficulty, setDifficulty] = useState("Level 1");
+  const [difficulty, setDifficulty] = useState("Functional Skills Level 1");
   const [lesson, setLesson] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
+
+  const currentLevelOptions = levelOptionsBySubject[subject];
+
+  useEffect(() => {
+    setDifficulty(levelOptionsBySubject[subject][0]);
+  }, [subject]);
 
   const showMessage = (type, text) => {
     setMessage({ type, text });
@@ -77,7 +111,7 @@ export default function GeneratorPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to generate lesson");
+        throw new Error(data.error || "Failed to generate topic");
       }
 
       setLesson(data);
@@ -99,10 +133,12 @@ Request:
 ${prompt}
 
 Subject: ${subject}
-Difficulty: ${difficulty}
+Learning Level: ${difficulty}
 
 Simple Explanation:
-${lesson.simpleExplanation?.map((item, index) => `${index + 1}. ${item}`).join("\n")}
+${lesson.simpleExplanation
+  ?.map((item, index) => `${index + 1}. ${item}`)
+  .join("\n")}
 
 Worked Examples:
 ${lesson.workedExamples
@@ -126,7 +162,7 @@ ${lesson.miniTasks
 
     try {
       await navigator.clipboard.writeText(formattedText);
-      showMessage("success", "Lesson copied to clipboard");
+      showMessage("success", "Topic copied to clipboard");
     } catch (error) {
       console.error("Copy failed:", error);
       showMessage("error", "Copy failed. Please try again.");
@@ -164,7 +200,7 @@ ${lesson.miniTasks
 
     addText(`Request: ${prompt}`, 11, true);
     addText(`Subject: ${subject}`);
-    addText(`Difficulty: ${difficulty}`);
+    addText(`Learning Level: ${difficulty}`);
     y += 5;
 
     addText("Simple Explanation", 14, true);
@@ -210,7 +246,7 @@ ${lesson.miniTasks
       const user = session?.user;
 
       if (!user) {
-        showMessage("error", "Please log in to save lessons.");
+        showMessage("error", "Please log in to save topics.");
         return;
       }
 
@@ -233,13 +269,13 @@ ${lesson.miniTasks
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || "Failed to save lesson");
+        throw new Error(result.error || "Failed to save topic");
       }
 
-      showMessage("success", "Lesson saved");
+      showMessage("success", "Topic saved");
     } catch (error) {
       console.error(error);
-      showMessage("error", error.message || "Could not save lesson.");
+      showMessage("error", error.message || "Could not save topic.");
     } finally {
       setIsSaving(false);
     }
@@ -256,7 +292,7 @@ ${lesson.miniTasks
             <h1>Make a difficult topic easier to understand</h1>
             <p className="generator-subtext">
               Enter a topic or question and generate a simple explanation,
-              practical examples, and mini tasks in seconds.
+              worked examples, and mini tasks at the right level.
             </p>
           </section>
 
@@ -271,7 +307,7 @@ ${lesson.miniTasks
               className="secondary-action-btn"
               onClick={() => navigate("/app/saved")}
             >
-              View Saved Lessons
+              View Saved Topics
             </button>
           </div>
 
@@ -283,7 +319,7 @@ ${lesson.miniTasks
             <textarea
               id="lesson-prompt"
               className="generator-textarea"
-              placeholder="e.g. Explain percentages for a Level 1 learner"
+              placeholder="e.g. Explain percentages for a Functional Skills Level 1 learner"
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               rows="5"
@@ -292,10 +328,12 @@ ${lesson.miniTasks
             <p
               className="example-prompt"
               onClick={() =>
-                setPrompt("Explain percentages for a Level 1 learner")
+                setPrompt(
+                  "Explain percentages for a Functional Skills Level 1 learner",
+                )
               }
             >
-              Try: "Explain percentages for a Level 1 learner"
+              Try: "Explain percentages for a Functional Skills Level 1 learner"
             </p>
 
             <div className="generator-controls">
@@ -313,17 +351,15 @@ ${lesson.miniTasks
               </div>
 
               <div className="form-group">
-                <label htmlFor="difficulty">Difficulty</label>
+                <label htmlFor="difficulty">Learning Level</label>
                 <select
                   id="difficulty"
                   value={difficulty}
                   onChange={(e) => setDifficulty(e.target.value)}
                 >
-                  <option>Entry Level</option>
-                  <option>Level 1</option>
-                  <option>Level 2</option>
-                  <option>GCSE Foundation Tier</option>
-                  <option>GCSE Higher Tier</option>
+                  {currentLevelOptions.map((level) => (
+                    <option key={level}>{level}</option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -343,13 +379,13 @@ ${lesson.miniTasks
 
           <section className="generator-meta">
             <div className="meta-pill">Subject: {subject}</div>
-            <div className="meta-pill">Difficulty: {difficulty}</div>
+            <div className="meta-pill">Level: {difficulty}</div>
           </section>
 
           {lesson && (
             <section className="generator-output">
               <div className="output-topbar">
-                <h2>Your lesson output</h2>
+                <h2>Your topic output</h2>
 
                 <div className="output-actions">
                   <button className="secondary-action-btn" onClick={handleCopy}>

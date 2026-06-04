@@ -46,7 +46,7 @@ Rules:
 - Be step-by-step
 - Keep the tone supportive and easy to follow
 - Use UK-relevant real-life examples where useful
-- Match the requested subject and difficulty
+- Match the requested subject and learning level exactly. For Maths, distinguish clearly between Functional Skills, GCSE, A Level, and University level.
 - Return exactly 3 mini tasks
 - Do not include markdown
 - Return valid JSON only
@@ -83,7 +83,7 @@ Required JSON shape:
     const userPrompt = `
 Topic/request: ${prompt}
 Subject: ${subject}
-Difficulty: ${difficulty}
+Learning level: ${difficulty}
 
 Generate:
 1. A very simple explanation in plain English
