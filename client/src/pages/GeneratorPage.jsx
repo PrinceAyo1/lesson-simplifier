@@ -5,6 +5,8 @@ import AppHeader from "../components/AppHeader";
 import "./GeneratorPage.css";
 import jsPDF from "jspdf";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 function OutputCard({ title, children }) {
   return (
     <section className="output-section-card">
@@ -60,7 +62,7 @@ export default function GeneratorPage() {
     try {
       setIsLoading(true);
 
-      const response = await fetch("http://localhost:5000/api/generate", {
+      const response = await fetch(`${API_BASE_URL}/api/generate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -212,7 +214,7 @@ ${lesson.miniTasks
         return;
       }
 
-      const response = await fetch("http://localhost:5000/api/lessons", {
+      const response = await fetch(`${API_BASE_URL}/api/lessons`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

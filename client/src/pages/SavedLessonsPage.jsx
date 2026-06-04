@@ -3,6 +3,8 @@ import { supabase } from "../services/supabase";
 import AppHeader from "../components/AppHeader";
 import "./SavedLessonsPage.css";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 function formatDate(dateString) {
   return new Date(dateString).toLocaleString("en-GB", {
     dateStyle: "medium",
@@ -42,9 +44,7 @@ export default function SavedLessonsPage() {
         return;
       }
 
-      const response = await fetch(
-        `http://localhost:5000/api/lessons/${user.id}`,
-      );
+      const response = await fetch(`${API_BASE_URL}/api/lessons/${user.id}`);
 
       const result = await response.json();
 
@@ -69,12 +69,9 @@ export default function SavedLessonsPage() {
 
       if (!confirmed) return;
 
-      const response = await fetch(
-        `http://localhost:5000/api/lessons/${lessonId}`,
-        {
-          method: "DELETE",
-        },
-      );
+      const response = await fetch(`${API_BASE_URL}/api/lessons/${lessonId}`, {
+        method: "DELETE",
+      });
 
       const result = await response.json();
 
