@@ -1,14 +1,54 @@
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { supabase } from "../services/supabase";
 import "./LandingPage.css";
 
 export default function LandingPage() {
   const navigate = useNavigate();
 
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const getSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      setUser(session?.user || null);
+    };
+
+    getSession();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+
+    setUser(null);
+
+    navigate("/");
+  };
+
   return (
     <div className="landing-page">
       <header className="navbar">
         <div className="container navbar__inner">
-          <div className="navbar__brand">Lesson Simplifier</div>
+          <div
+            className="navbar__brand"
+            onClick={() => navigate("/")}
+            style={{ cursor: "pointer" }}
+          >
+            Lesson Simplifier
+          </div>
 
           <nav className="navbar__links">
             <a href="#features">Features</a>
@@ -16,12 +56,38 @@ export default function LandingPage() {
             <a href="#pricing">Pricing</a>
           </nav>
 
-          <button
-            className="navbar__cta"
-            onClick={() => navigate("/app/generate")}
-          >
-            Try it now
-          </button>
+          <div className="navbar__actions">
+            {user ? (
+              <>
+                <button
+                  className="navbar__secondary"
+                  onClick={() => navigate("/app/generate")}
+                >
+                  Go to app
+                </button>
+
+                <button className="navbar__cta" onClick={handleLogout}>
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  className="navbar__secondary"
+                  onClick={() => navigate("/auth")}
+                >
+                  Login
+                </button>
+
+                <button
+                  className="navbar__cta"
+                  onClick={() => navigate("/app/generate")}
+                >
+                  Try it now
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </header>
 
@@ -67,9 +133,11 @@ export default function LandingPage() {
             <div className="hero__preview">
               <div className="preview-card">
                 <div className="preview-label">Learning request</div>
+
                 <div className="preview-title">
                   Explain percentages for a Level 1 learner
                 </div>
+
                 <div className="preview-list">
                   <div>Subject: Maths</div>
                   <div>Level: Level 1</div>
@@ -79,7 +147,9 @@ export default function LandingPage() {
 
               <div className="preview-card">
                 <div className="preview-label">Generated preview</div>
+
                 <div className="preview-title">Simple explanation</div>
+
                 <div className="preview-list">
                   <div>Percent means out of 100.</div>
                   <div>50% means 50 out of 100.</div>
@@ -89,6 +159,7 @@ export default function LandingPage() {
 
               <div className="preview-card">
                 <div className="preview-label">Mini task</div>
+
                 <div className="preview-task">
                   What is 50% of 20?
                   <br />
@@ -103,6 +174,7 @@ export default function LandingPage() {
           <div className="container features__grid">
             <article className="feature-card">
               <h3 className="feature-card__title">Clearer understanding</h3>
+
               <p className="feature-card__text">
                 Break difficult topics into simpler language and manageable
                 steps.
@@ -113,6 +185,7 @@ export default function LandingPage() {
               <h3 className="feature-card__title">
                 Different levels supported
               </h3>
+
               <p className="feature-card__text">
                 Adapt explanations for Entry Level, Level 1, Level 2 and GCSE
                 pathways.
@@ -123,6 +196,7 @@ export default function LandingPage() {
               <h3 className="feature-card__title">
                 Useful for learning and revision
               </h3>
+
               <p className="feature-card__text">
                 Get explanations, examples and practice tasks that are easy to
                 use for study, teaching or support at home.
@@ -135,9 +209,11 @@ export default function LandingPage() {
           <div className="container">
             <div className="section-heading">
               <p className="section-heading__eyebrow">See how it works</p>
+
               <h2 className="section-heading__title">
                 A clear output for learning, revision and support
               </h2>
+
               <p className="section-heading__text">
                 Every response is designed to make difficult ideas easier to
                 follow without losing the key meaning.
@@ -147,6 +223,7 @@ export default function LandingPage() {
             <div className="example__grid">
               <article className="output-card">
                 <h3>Simple Explanation</h3>
+
                 <ul>
                   <li>A percentage is an amount out of 100.</li>
                   <li>25% means 25 out of 100.</li>
@@ -156,6 +233,7 @@ export default function LandingPage() {
 
               <article className="output-card">
                 <h3>Examples</h3>
+
                 <ul>
                   <li>20% off a £10 item means £2 off.</li>
                   <li>8 out of 10 in a quiz is 80%.</li>
@@ -165,6 +243,7 @@ export default function LandingPage() {
 
               <article className="output-card">
                 <h3>Mini Tasks</h3>
+
                 <ul>
                   <li>What is 10% of 50?</li>
                   <li>What is 25% of 40?</li>
@@ -180,6 +259,7 @@ export default function LandingPage() {
             <div className="cta-banner__inner">
               <div>
                 <h2>Get clear explanations without the stress</h2>
+
                 <p>
                   Use Lesson Simplifier to make learning, revision and topic
                   support faster and easier.
@@ -198,6 +278,7 @@ export default function LandingPage() {
         <div className="container footer__inner">
           <div>
             <div className="footer__brand">Lesson Simplifier</div>
+
             <p className="footer__text">
               AI support for clearer understanding, learning and revision.
             </p>

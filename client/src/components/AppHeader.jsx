@@ -1,13 +1,38 @@
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../services/supabase";
 import "./AppHeader.css";
 
 export default function AppHeader() {
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const getSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      setUser(session?.user || null);
+    };
+
+    getSession();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    navigate("/auth");
+    setUser(null);
+    navigate("/auth", { replace: true });
   };
 
   return (
@@ -23,9 +48,18 @@ export default function AppHeader() {
             <Link to="/app/saved">Saved Lessons</Link>
           </nav>
 
-          <button className="app-header__logout" onClick={handleLogout}>
-            Logout
-          </button>
+          {user ? (
+            <button className="app-header__logout" onClick={handleLogout}>
+              Logout
+            </button>
+          ) : (
+            <button
+              className="app-header__logout"
+              onClick={() => navigate("/auth")}
+            >
+              Login
+            </button>
+          )}
         </div>
       </header>
 

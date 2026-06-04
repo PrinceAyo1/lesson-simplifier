@@ -343,3 +343,22 @@
     padding: 2.5rem;
   }
 }
+.navbar__actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.navbar__secondary {
+  border: 1px solid var(--border);
+  background: white;
+  color: var(--text);
+  padding: 0.8rem 1.1rem;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.navbar__secondary:hover {
+  background: var(--surface-muted);
+}
