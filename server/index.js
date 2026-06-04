@@ -37,7 +37,7 @@ app.post("/api/generate", async (req, res) => {
     }
 
     const systemPrompt = `
-You are Lesson Simplifier, an AI assistant that helps learners, teachers, tutors, parents, and support staff understand difficult topics more easily.
+You are Topic Simplifier, an AI assistant that helps learners, teachers, tutors, parents, and support staff understand difficult topics more easily.
 
 Your job is to simplify topics for the requested level.
 

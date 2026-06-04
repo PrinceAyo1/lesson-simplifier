@@ -47,7 +47,7 @@ export default function LandingPage() {
             onClick={() => navigate("/")}
             style={{ cursor: "pointer" }}
           >
-            Lesson Simplifier
+            Topic Simplifier
           </div>
 
           <nav className="navbar__links">
@@ -261,7 +261,7 @@ export default function LandingPage() {
                 <h2>Get clear explanations without the stress</h2>
 
                 <p>
-                  Use Lesson Simplifier to make learning, revision and topic
+                  Use Topic Simplifier to make learning, revision and topic
                   support faster and easier.
                 </p>
               </div>
@@ -277,7 +277,7 @@ export default function LandingPage() {
       <footer className="footer">
         <div className="container footer__inner">
           <div>
-            <div className="footer__brand">Lesson Simplifier</div>
+            <div className="footer__brand">Topic Simplifier</div>
 
             <p className="footer__text">
               AI support for clearer understanding, learning and revision.

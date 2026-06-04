@@ -39,7 +39,7 @@ export default function SavedLessonsPage() {
       const user = session?.user;
 
       if (!user) {
-        setError("Please log in to view saved lessons.");
+        setError("Please log in to view saved topics.");
         setLessons([]);
         return;
       }
@@ -55,7 +55,7 @@ export default function SavedLessonsPage() {
       setLessons(result);
     } catch (err) {
       console.error(err);
-      setError(err.message || "Could not load saved lessons.");
+      setError(err.message || "Could not load saved topics.");
     } finally {
       setLoading(false);
     }
@@ -102,7 +102,7 @@ export default function SavedLessonsPage() {
       <main className="saved-lessons-page">
         <div className="saved-lessons-container">
           <section className="saved-lessons-header">
-            <p className="saved-lessons-eyebrow">Saved Lessons</p>
+            <p className="saved-lessons-eyebrow">Saved Topics</p>
             <h1>Your saved topics and revision support</h1>
             <p className="saved-lessons-subtext">
               Revisit saved explanations, worked examples, and mini tasks
@@ -117,7 +117,7 @@ export default function SavedLessonsPage() {
           )}
 
           {loading && (
-            <p className="saved-state-message">Loading saved lessons...</p>
+            <p className="saved-state-message">Loading saved topics...</p>
           )}
 
           {!loading && error && (
@@ -128,7 +128,7 @@ export default function SavedLessonsPage() {
 
           {!loading && !error && lessons.length === 0 && (
             <div className="saved-state-card">
-              <h2>No saved lessons yet</h2>
+              <h2>No saved topics yet</h2>
               <p>
                 Generate a topic, then save it to build your own revision
                 library.

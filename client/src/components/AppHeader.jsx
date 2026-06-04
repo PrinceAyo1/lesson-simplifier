@@ -45,7 +45,7 @@ export default function AppHeader() {
 
           <nav className="app-header__nav">
             <Link to="/app/generate">Generate</Link>
-            <Link to="/app/saved">Saved Lessons</Link>
+            <Link to="/app/saved">Saved Topics</Link>
           </nav>
 
           {user ? (

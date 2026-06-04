@@ -7,6 +7,15 @@ import "./GeneratorPage.css";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
+const generalLevelOptions = [
+  "Young Learner",
+  "Secondary School",
+  "GCSE",
+  "A Level",
+  "Adult Learner",
+  "University",
+];
+
 const levelOptionsBySubject = {
   Maths: [
     "Functional Skills Entry Level",
@@ -25,47 +34,12 @@ const levelOptionsBySubject = {
     "A Level",
     "University",
   ],
-  "General explanation": [
-    "Young Learner",
-    "Secondary School",
-    "GCSE",
-    "A Level",
-    "Adult Learner",
-    "University",
-  ],
+  Science: generalLevelOptions,
+  History: generalLevelOptions,
+  Geography: generalLevelOptions,
+  "General Knowledge": generalLevelOptions,
+  "Life Skills": generalLevelOptions,
 };
-
-function OutputCard({ title, children }) {
-  return (
-    <section className="output-section-card">
-      <h2>{title}</h2>
-      {children}
-    </section>
-  );
-}
-
-function TaskItem({ question, answer }) {
-  const [showAnswer, setShowAnswer] = useState(false);
-
-  return (
-    <div className="task-item">
-      <p className="task-question">{question}</p>
-
-      <button
-        className="toggle-answer-btn"
-        onClick={() => setShowAnswer((prev) => !prev)}
-      >
-        {showAnswer ? "Hide answer" : "Show answer"}
-      </button>
-
-      {showAnswer && (
-        <p className="task-answer">
-          <strong>Answer:</strong> {answer}
-        </p>
-      )}
-    </div>
-  );
-}
 
 export default function GeneratorPage() {
   const navigate = useNavigate();
@@ -78,7 +52,8 @@ export default function GeneratorPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
 
-  const currentLevelOptions = levelOptionsBySubject[subject];
+  const currentLevelOptions =
+    levelOptionsBySubject[subject] || generalLevelOptions;
 
   useEffect(() => {
     setDifficulty(levelOptionsBySubject[subject][0]);
@@ -346,7 +321,11 @@ ${lesson.miniTasks
                 >
                   <option>Maths</option>
                   <option>English</option>
-                  <option>General explanation</option>
+                  <option>Science</option>
+                  <option>History</option>
+                  <option>Geography</option>
+                  <option>General Knowledge</option>
+                  <option>Life Skills</option>
                 </select>
               </div>
 
