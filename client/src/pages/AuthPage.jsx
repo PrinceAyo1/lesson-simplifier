@@ -1,15 +1,32 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "../services/supabase";
+import "./AuthPage.css";
 
 export default function AuthPage() {
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
 
-  const handleAuth = async () => {
+  const [message, setMessage] = useState({
+    type: "",
+    text: "",
+  });
+
+  const showMessage = (type, text) => {
+    setMessage({ type, text });
+  };
+
+  const handleAuth = async (e) => {
+    e.preventDefault();
+
     try {
       setLoading(true);
+      setMessage({ type: "", text: "" });
 
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({
@@ -19,7 +36,7 @@ export default function AuthPage() {
 
         if (error) throw error;
 
-        window.location.href = "/app/generate";
+        navigate("/app/generate");
       } else {
         const { error } = await supabase.auth.signUp({
           email,
@@ -28,46 +45,67 @@ export default function AuthPage() {
 
         if (error) throw error;
 
-        window.location.href = "/app/generate";
+        showMessage("success", "Account created. You can now log in.");
+
+        setIsLogin(true);
       }
     } catch (error) {
-      alert(error.message);
+      showMessage("error", error.message || "Something went wrong.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <main style={{ padding: "2rem", maxWidth: "400px", margin: "0 auto" }}>
-      <h1>{isLogin ? "Login" : "Sign Up"}</h1>
+    <main className="auth-page">
+      <section className="auth-card">
+        <p className="auth-subtitle">Topic Simplifier</p>
 
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        style={{ width: "100%", marginBottom: "1rem", padding: "0.8rem" }}
-      />
+        <h1 className="auth-title">
+          {isLogin ? "Welcome back" : "Create your account"}
+        </h1>
 
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        style={{ width: "100%", marginBottom: "1rem", padding: "0.8rem" }}
-      />
+        <p className="auth-subtitle">
+          {isLogin
+            ? "Log in to save topics, revisit explanations, and export your learning materials."
+            : "Sign up to save generated topics and build your own revision library."}
+        </p>
 
-      <button onClick={handleAuth} disabled={loading}>
-        {loading ? "Loading..." : isLogin ? "Login" : "Sign Up"}
-      </button>
+        {message.text && (
+          <div className={`auth-message ${message.type}`}>{message.text}</div>
+        )}
 
-      <p style={{ marginTop: "1rem", cursor: "pointer" }}>
-        {isLogin ? "No account? Sign up" : "Already have an account? Login"}
-      </p>
+        <form onSubmit={handleAuth}>
+          <input
+            className="auth-input"
+            type="email"
+            placeholder="Email address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
 
-      <button onClick={() => setIsLogin(!isLogin)}>
-        Switch to {isLogin ? "Sign Up" : "Login"}
-      </button>
+          <input
+            className="auth-input"
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+
+          <button className="auth-button" disabled={loading}>
+            {loading ? "Please wait..." : isLogin ? "Login" : "Sign Up"}
+          </button>
+        </form>
+
+        <div className="auth-switch">
+          {isLogin ? "No account yet?" : "Already have an account?"}{" "}
+          <button type="button" onClick={() => setIsLogin((prev) => !prev)}>
+            {isLogin ? "Sign up" : "Login"}
+          </button>
+        </div>
+      </section>
     </main>
   );
 }
