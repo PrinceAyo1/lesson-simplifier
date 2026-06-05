@@ -41,6 +41,15 @@ const levelOptionsBySubject = {
   "Life Skills": generalLevelOptions,
 };
 
+function OutputCard({ title, children }) {
+  return (
+    <section className="output-section-card">
+      <h2>{title}</h2>
+      {children}
+    </section>
+  );
+}
+
 export default function GeneratorPage() {
   const navigate = useNavigate();
 
