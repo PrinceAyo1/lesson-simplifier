@@ -49,7 +49,28 @@ function OutputCard({ title, children }) {
     </section>
   );
 }
+function TaskItem({ question, answer }) {
+  const [showAnswer, setShowAnswer] = useState(false);
 
+  return (
+    <div className="task-item">
+      <p className="task-question">{question}</p>
+
+      <button
+        className="toggle-answer-btn"
+        onClick={() => setShowAnswer((prev) => !prev)}
+      >
+        {showAnswer ? "Hide answer" : "Show answer"}
+      </button>
+
+      {showAnswer && (
+        <p className="task-answer">
+          <strong>Answer:</strong> {answer}
+        </p>
+      )}
+    </div>
+  );
+}
 export default function GeneratorPage() {
   const navigate = useNavigate();
 
